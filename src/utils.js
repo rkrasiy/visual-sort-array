@@ -1,3 +1,6 @@
+import {useEffect} from "react"
+
+
 function getRandomInt(min = 10, max = 500) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -5,23 +8,46 @@ function getRandomInt(min = 10, max = 500) {
 }
 
 function fillArray(num){
-    let arr = []
-    
-   for(let i = 0; i < num; i++){
-        let founded = false;
-        while(!founded){
-            let num = getRandomInt();
-            if(!arr.includes(num)){
-                arr[i] = num;
-                founded = true;
-            }
-        }
-   }
+    return Array.from({length: num}, (_, i) => {
+        let num = getRandomInt();
+        let id = "id" + Math.random().toString(16).slice(2)
+        return {id: id, moved: false, number: num}
+    });
+}
 
-   return arr;
+function useBubbleAlgoritm(props){
+    console.log("start sorting")
+    
+
+    useEffect(() => {
+        let isSorted;
+        let start = 0;
+        let start2 = 0;
+		const interval = setInterval(() => {
+            let copyList = props.arr
+            start++
+            let next = copyList[start + 1] || copyList.length;
+            if(copyList[start] > copyList[next]){
+                let value = copyList[start];
+                copyList[next] = value;
+                props.updateArr(copyList)
+                console.log(copyList)
+            }
+
+		}, 1000);
+
+        if(isSorted) clearInterval(interval)
+
+		return () => clearInterval(interval);
+	}, []);
+
+    
+    //Add setInterval
+    //every second sort one element
 }
 
 export {
     getRandomInt,
-    fillArray
+    fillArray,
+    useBubbleAlgoritm
 }

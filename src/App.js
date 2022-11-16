@@ -1,31 +1,95 @@
 import { useEffect, useState } from "react";
 import Logo from "./components/logo";
 import Item from "./components/item";
-import { fillArray } from "./utils"
+import { fillArray, useBubbleAlgoritm } from "./utils"
 import classes from "./app.module.css"
+import { ArrayVisualizing } from "./components/array-visualizing";
 
 function App() {
-	const [ listLength, setListLength ] = useState(10)
+	const [ listLength, setListLength ] = useState(20)
+	const [ count, setCount ] = useState(0);
+	const [ round, setRound ] = useState(0);
+	const [ active, setActive ] = useState(0);
 	const [ list, setList] = useState(fillArray(listLength));
 
-	useEffect(()=>{
-
-	})
-	
 	const updateArrayHandler = ()=>{
 		setList(fillArray(listLength))
 	}
 	const changeRangeHandler = (e)=>{
-		setListLength(e.target.value);
+		let value = parseInt(e.target.value)
+		setListLength(value);
 		setList(fillArray(listLength))
 	}
 
+
+	let timer;
+	
 	const startHandler = ()=>{
-		//Add setInterval
-		//every second sort one element
+		let index = 0
+		let counter = count;
+		let controller = false;
+		let run = 0
+		timer = setInterval(()=>{
+			//if(!controller){
+				//if(controller) clearInterval(timer)
+				
+				
+				let copyList = [...list]	
+				let a = index
+				let b = index + 1 >= list.length - 1 ? list.length - 1 : index + 1;
+				//console.log(index, copyList[a] , copyList[b])
+				
+				try{
+					if(copyList[a].number > copyList[b].number){
+						//console.log(counter, true)
+						const max = copyList[a].number;
+						const min =  copyList[b].number;
+						copyList[a].number = min;
+						copyList[b].number = max;
+						copyList[b].moved = true;
+						copyList[a].moved = false;
+						setList([...copyList]);
+						controller = false
+					
+					}
+				}catch(e){
+					console.log(e)
+					console.log("Index: ", index)
+					console.log(copyList[a] , copyList[b])
+					console.log("Length", listLength)
+					console.log("real Length :", list.length);
+					console.log("Pos: ", a, b);
+					console.log(list)
+					clearInterval(timer)
+				}
+				index++
+				counter++
+				setActive(index)
+				setCount(counter)
+				if(index >=  list.length - 1) {
+					index = 0;
+					run++;
+					setRound(run)
+					if(controller){
+				
+						clearInterval(timer)
+					}
+					controller = true
+				}
+			//}
+			
+			
+		}, 10)
 	}
 
-	console.log(listLength)
+	const stopInterval = () =>{
+		console.log("end sorting")
+		clearInterval(timer)
+		timer = null
+	}
+
+
+	//console.log(list)
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -35,16 +99,14 @@ function App() {
 				<input type="range" min="5" max="150" onChange={changeRangeHandler} value={listLength} />
 
 				<button onClick={startHandler}>Start</button>
+				<button onClick={stopInterval}>stop</button>
 			</header>
 			<main>
-				<div className={classes.wrapper}>
-					{
-						list.map( el => (
-							<Item key={el} value={el} />
-						))
-					}	
-				</div>
-				
+				<p>Array length: {list.length}</p>
+				<p>operations:{count}</p>
+				<p>runs:{round}</p>
+
+				<ArrayVisualizing items={list}	active={active}/>
 			</main>
 		</div>
 	);
