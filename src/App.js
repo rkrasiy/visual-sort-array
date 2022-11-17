@@ -4,6 +4,7 @@ import Item from "./components/item";
 import { fillArray, useBubbleAlgoritm } from "./utils"
 import classes from "./app.module.css"
 import { ArrayVisualizing } from "./components/array-visualizing";
+import Canvas from "./components/canvas";
 
 function App() {
 	const [ listLength, setListLength ] = useState(20)
@@ -88,7 +89,13 @@ function App() {
 		timer = null
 	}
 
-
+	const draw = (ctx, frameCount) => {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        ctx.fillStyle = '#ddd';
+        ctx.beginPath();
+        ctx.arc(50, 100, 20*Math.sin(frameCount*0.05)**2, 0, 2*Math.PI);
+        ctx.fill();
+    }
 	//console.log(list)
 	return (
 		<div className="App">
@@ -105,8 +112,8 @@ function App() {
 				<p>Array length: {list.length}</p>
 				<p>operations:{count}</p>
 				<p>runs:{round}</p>
-
-				<ArrayVisualizing items={list}	active={active}/>
+				<Canvas draw={draw}/>
+				{/* <ArrayVisualizing items={list}	active={active}/> */}
 			</main>
 		</div>
 	);
