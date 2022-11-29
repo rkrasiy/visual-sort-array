@@ -1,30 +1,31 @@
 import {useEffect, useState} from 'react';
 import Logo from '../components/logo';
 import * as sortingAlgorithms from '../sortingAlgoritm/sortingAlgoritm';
-import classes from "./sorting-visualizer.module.css";
 
 function SortingVisualizer(){
     const [array, setArray] = useState([]);
     const [arrayLength, setArrayLength] = useState(100);
-    const [animationSpeed_MS, setAnimationSpeed_MS] = useState(2000)
+    const [animationSpeed_MS, setAnimationSpeed_MS] = useState(3)
+    const [isSorted, setIsSorted] = useState(false);
 
     useEffect(()=>{
        resetArray()
     },[arrayLength])
 
     const resetArray = () => {
-        const newArray = [];
+       const newArray = [];
         for(let i = 0; i < arrayLength; i++){
             newArray.push(randomIntFromInteral(5, 650))
         }
 
+        setIsSorted(false);
         setArray(newArray)
     }
 
     const mergeSort = () =>{
         const animations = sortingAlgorithms.mergeSort(array);
         for(let i = 0; i < animations.length; i++){
-            const arrayBars = document.getElementsByClassName(classes.bar);
+            const arrayBars = document.getElementsByClassName("bar")
             const isColorChange = i % 3 !== 2;
           
             if(isColorChange){
@@ -38,24 +39,80 @@ function SortingVisualizer(){
                 },i * animationSpeed_MS)
             }else{
                 setTimeout(()=>{
-                    const [barOneIdx, newHeight] = animations[i];
+                    const [barOneIdx, newHeight, barTwoIdx, oldHeight] = animations[i];
+                    console.log(animations[i])
                     const barOneStyle = arrayBars[barOneIdx].style;
                     barOneStyle.height = `${newHeight}px`;
-                    arrayBars[barOneIdx].innerHTML = newHeight;
+                    if(barTwoIdx){
+                        const barTwoStyle = arrayBars[barTwoIdx].style;
+                        barTwoStyle.height = `${oldHeight}px`;
+                    }
+                    //arrayBars[barOneIdx].innerHTML = newHeight;
+                }, i * animationSpeed_MS)
+            }
+            if(i ===  animations.length - 1){
+                setTimeout(()=>{
+                   setIsSorted(true)
                 }, i * animationSpeed_MS)
             }
         }
     }
+
     const quickSort = () =>{
         console.log("quickSort")
     }
     const heapSort = () =>{
         console.log("heapSort")
     }
-    const bubbleSort = () =>{
-        console.log("bubbleSort");
-        const animations = sortingAlgorithms.bubbleSort(array);
-        console.log(animations)
+    // const bubbleSort = () =>{
+    //     console.log("bubbleSort");
+    //     const animations = sortingAlgorithms.bubbleSort(array);
+    //     console.log(animations);
+    //     let round = 2;
+    //      for(let i = 0; i < animations.length; i++){
+    //         const arrayBars = document.getElementsByClassName("bar")
+    //        // const isColorChange = i % 3 !== 2;
+          
+    //         if(animations[i].length > 0) {
+    //             if(animations[i].length <= 3){
+    //                 const [barOneIdx, barTwoIdx] = animations[i];
+    //                 if(typeof barOneIdx === "boolean") {
+    //                     setTimeout(()=>{
+    //                         arrayBars[barTwoIdx].style.backgroundColor = "pink"
+    //                     },i * animationSpeed_MS)
+    //                 }else{
+    //                   //  console.log(animations[i])
+    //                     const barOneStyle = arrayBars[barOneIdx].style;
+    //                     const barTwoStyle = arrayBars[barTwoIdx].style;
+                      
+    //                     setTimeout(()=>{
+    //                         barOneStyle.backgroundColor = "turquoise";
+    //                         barTwoStyle.backgroundColor = "turquoise";
+    //                     },i * animationSpeed_MS)
+                       
+    //                 }
+    //             }else{                  
+    //                 setTimeout(()=>{
+    //                     const [barOneIdx, barTwoIdx ] = animations[i - 1];
+    //                     const valueMin = animations[i][barOneIdx];//98
+    //                     const valueMax = animations[i][barTwoIdx];//99
+    //                  //   console.log(valueMax, valueMin,  animations[i - 1],  animations[i])
+    //                     const barOneStyle = arrayBars[barOneIdx].style;
+    //                     const barTwoStyle = arrayBars[barTwoIdx].style;
+                      
+    //                     barOneStyle.height = valueMin + "px";
+    //                     barTwoStyle.height = valueMax + "px";
+    //                     barOneStyle.backgroundColor = "turquoise";
+    //                     barTwoStyle.backgroundColor = "red";
+    //                 },i * animationSpeed_MS)
+    //             }
+    //         }
+    //     }
+        
+    // }
+    const bubbleSort = () => {
+        const animations = sortingAlgorithms.bubbleSort(array, (newArr)=>setArray(newArr));
+       // console.log(animations)
     }
 
 	const changeRangeHandler = (e)=>{
@@ -63,7 +120,7 @@ function SortingVisualizer(){
         let speed = 3
 
         if(value <= 20){
-            speed = 3000
+            speed = 300
         }else if(value <= 50){
             speed = 15
         }else if(value <= 100){
@@ -80,7 +137,7 @@ function SortingVisualizer(){
         setArrayLength(value)
         //resetArray()
 	}
-
+    const classes = isSorted ? "sorted bar" : "bar"
     return (
   
         <>
@@ -88,22 +145,17 @@ function SortingVisualizer(){
 				<Logo />
 				<input type="range" min="10" max="300" step="10" onChange={changeRangeHandler} value={arrayLength}/>
                 <span>{array.length}</span>
-                    <button onClick={mergeSort} className={classes.sortBtn}>merge Sort</button>
-                    <button onClick={quickSort} className={classes.sortBtn}>quick Sort</button>
-                    <button onClick={heapSort} className={classes.sortBtn}>heap Sort</button>
-                    <button onClick={bubbleSort} className={classes.sortBtn}>bubble Sort</button>
+                    <button onClick={mergeSort} className="sortBtn">merge Sort</button>
+                    <button onClick={quickSort} className="sortBtn">quick Sort</button>
+                    <button onClick={heapSort} className="sortBtn">heap Sort</button>
+                    <button onClick={bubbleSort} className="sortBtn">bubble Sort</button>
 			</header>
-            <div className={classes.container}>
+            <div className="container">
                 {
-                    array.map((value, idx)=><div className={classes.bar} key={idx} style={{height: `${value}px`}}>{value}</div>)
+                    array.map((value, idx)=><div className={classes} key={idx} style={{height: `${value}px`}}>{value}</div>)
                 }
             </div>
-            <div className={classes.contdos}>
-                {
-                    array.map((value, idx)=><div key={idx} className={classes.bardos} style={{height: `20px`}}>{idx}</div>)
-                }
-            </div>
-         <button onClick={resetArray} className={classes.btn}>Generate new Array</button>
+         <button onClick={resetArray} className="btn">Generate new Array</button>
 
         </>
     )
