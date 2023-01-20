@@ -14,3 +14,8 @@
 .active{
     background: rgb(0, 251, 255);
 }
+
+.logo {
+    display: flex;
+    font-weight: 600;
+}

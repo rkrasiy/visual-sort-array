@@ -12,13 +12,89 @@ code {
     monospace;
 }
 
+header {
+    display: flex;
+    align-items: center;
+    background-color: #ede9fe;
+}
+header > * {
+    padding: 10px 1em;
+}
+section {
+    display: flex;
+    flex-grow: 1;
+    gap: 1rem;
+    padding: 0 ;
+}
+header h4,
+header h1 {
+    margin: 0;
+}
+header h4 {margin-bottom: .5em;}
+section,
+section > div:not(:first-child) {
+    border-left: 1px solid rgb(167, 167, 167);
+}
+section > div {
+    padding: .5rem;
+}
+
+.btn {
+    font-weight: 600;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    border-radius: 0.5rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #eff6ff;
+    width: auto;
+    outline: none;
+    border: none;
+    background-color: #3b82f6;
+    cursor: pointer;
+    margin-right: .5em;
+}
+.btn.btn-run{
+    margin: 2rem auto 0;
+    display: inherit;
+    background: #1f2937;
+    height: 2.5rem;
+    color: #f3f4f6 ;
+    
+}
+.btn.btn-run:hover{
+    background: #374151;
+}
+.btn:hover {
+    background-color: #1e40af;
+}
+
+.sortBtn.active {
+    background-color: #1d4ed8;
+    color: #dbeafe;
+}
+.sortBtn.active.disabled {
+    background-color: #bfdbfe;
+    color: #2563eb;
+}
+.disabled {
+    background-color: #bfdbfe;
+    color: #2563eb;
+    cursor: not-allowed;
+}
+.btn.btn-run.disabled{
+    background-color: #d1d5db;
+    color: #111827;
+}
 
 .container{
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     max-width: 1350px;
-    height: 800px;
+    height: 80vh;
     margin: 0 auto;
     gap: 2px;
 }
@@ -34,10 +110,7 @@ code {
     background-color: rgb(216, 60, 206)!important;
 }
 
-.btn{
-    margin: 2rem auto;
-    display: inherit;
-}
+
 
 .contdos{
     display: flex;

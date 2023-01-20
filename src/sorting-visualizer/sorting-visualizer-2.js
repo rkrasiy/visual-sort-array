@@ -1,20 +1,30 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import Logo from '../components/logo';
 import * as sortingAlgorithms from '../sortingAlgoritm/sortingAlgoritm';
 
-function SortingVisualizer(){
-    const [array, setArray] = useState([]);
-    const [arrayLength, setArrayLength] = useState(100);
-    const [animationSpeed_MS, setAnimationSpeed_MS] = useState(3)
-    const [isSorted, setIsSorted] = useState(false);
-    const [ isRunning, setIsRunning] = useState(false);
+function SortingVisualizer2(){
+    const [ array, setArray ] = useState([]);
+    const [ arrayLength, setArrayLength ] = useState(200);
+    const [ animationSpeed_MS, setAnimationSpeed_MS ] = useState(3)
+    const [ isSorted, setIsSorted ] = useState(false);
+    const [ method, setMethod ] = useState( "Merge" );
+    const [ isRunning, setIsRunning ] = useState(false);
+
+    // const [ controller, setController ] = useState({
+    //     isSorted: false,
+    //     isRunning: false,
+    //     isFinished: false,
+    //     method: "mergeSort"
+    // })
 
     useEffect(()=>{
        resetArray()
-    },[arrayLength])
+    },[ arrayLength ])
+   
 
     const resetArray = () => {
-       const newArray = [];
+      //  if(isRunning ) return;
+        const newArray = [];
         for(let i = 0; i < arrayLength; i++){
             newArray.push(randomIntFromInteral(5, 650))
         }
@@ -23,8 +33,25 @@ function SortingVisualizer(){
         setArray(newArray)
     }
 
-    const mergeSort = () =>{
-        const animations = sortingAlgorithms.mergeSort(array);
+    const selectMethodHandler = ( foo ) => {
+      //  if(isRunning) return;
+        setMethod(foo)
+    }
+
+    const startHandler = () => {
+        //if(isRunning) return;
+
+        //setIsRunning(true)
+        if(method === "Merge"){
+            mergeSortMethod(array);
+        }
+        else if(method === "Bubble") 
+            sortingAlgorithms.bubbleSort(array, (newArr)=>setArray(newArr));
+    }
+
+    const mergeSortMethod = (arr) => {
+        const animations = sortingAlgorithms.mergeSort(arr);
+    
         for(let i = 0; i < animations.length; i++){
             const arrayBars = document.getElementsByClassName("bar")
             const isColorChange = i % 3 !== 2;
@@ -37,38 +64,36 @@ function SortingVisualizer(){
                 setTimeout(()=>{
                     barOneStyle.backgroundColor = color;
                     barTwoStyle.backgroundColor = color;
-                },i * animationSpeed_MS)
+                }, i * animationSpeed_MS)
             }else{
                 setTimeout(()=>{
                     const [barOneIdx, newHeight, barTwoIdx, oldHeight] = animations[i];
-                   // console.log(animations[i])
+    
                     const barOneStyle = arrayBars[barOneIdx].style;
                     barOneStyle.height = `${newHeight}px`;
                     if(barTwoIdx){
                         const barTwoStyle = arrayBars[barTwoIdx].style;
                         barTwoStyle.height = `${oldHeight}px`;
                     }
-                    //arrayBars[barOneIdx].innerHTML = newHeight;
+           
                 }, i * animationSpeed_MS)
             }
             if(i ===  animations.length - 1){
                 setTimeout(()=>{
                    setIsSorted(true)
+                  // setIsRunning(false)
                 }, i * animationSpeed_MS)
             }
         }
     }
 
-    const bubbleSort = () => {
-        const animations = sortingAlgorithms.bubbleSort(array, (newArr)=>setArray(newArr));
-    }
-
 	const changeRangeHandler = (e)=>{
+       // if(isRunning) return;
         let value = parseInt(e.target.value);
         let speed = 3
 
         if(value <= 20){
-            speed = 300
+            speed = 30
         }else if(value <= 50){
             speed = 15
         }else if(value <= 100){
@@ -83,17 +108,15 @@ function SortingVisualizer(){
 
         setAnimationSpeed_MS(speed)
         setArrayLength(value)
-        //resetArray()
 	}
-    const classes = isSorted ? "sorted bar" : "bar"
+
     return (
-  
         <>
-          <header className="App-header">
-				<Logo />
+            <header>
+                <Logo />
                 <section>
                     <div>
-                         <h4>Array length</h4>
+                        <h4>Array length</h4>
                         <input type="range" min="10" max="300" step="10" onChange={changeRangeHandler} value={arrayLength}/>
                         <span>{array.length}</span>
                     </div>
@@ -101,29 +124,38 @@ function SortingVisualizer(){
                         <h4>Methods</h4>
                         {
                             [
-                                { name: "Merge", func: mergeSort }, 
-                                { name: "Buble", func: bubbleSort }
-                            ].map( btn => (
-                                <button 
-                                    key = { btn.name } 
-                                    onClick = { btn.func } 
-                                    className = "btn sortBtn">
-                                        { btn.name }
+                                "Merge",
+                                "Bubble"
+                            ].map( item => (
+                                 <button key={item}
+                                    onClick={() => selectMethodHandler(item)} 
+                                    className={`btn sortBtn ${item === method ? "active" : ""} ${isRunning ? "disabled" : ""}`}>
+                                        {item}
                                     </button>
                             ))
                         }
                     </div>
                     <div>
                         <h4>New Array</h4>
-                        <button onClick={resetArray} className="btn green">Generate</button>
+                        <button onClick={resetArray} className={`btn ${isRunning ? "disabled" : ""}`}>Generate</button>
                     </div>
                 </section>
 			</header>
+
+            <button onClick={startHandler} className={`btn btn-run ${isRunning || isSorted ? "disabled" : ""}`}>START</button>
+            
             <div className="container">
                 {
-                    array.map((value, idx)=><div className={classes} key={idx} style={{height: `${value}px`}}></div>)
+                    array.map((value, idx)=>(
+                        <div className={`bar ${isSorted ? "sorted" : ""}`} 
+                            key={idx} 
+                            style={
+                                { height: `${value}px` }
+                            }></div>
+                    ))
                 }
             </div>
+
         </>
     )
 }
@@ -140,4 +172,4 @@ function arraysAreEqual(array1, array2){
     return true;
 }
 
-export default SortingVisualizer
+export default SortingVisualizer2

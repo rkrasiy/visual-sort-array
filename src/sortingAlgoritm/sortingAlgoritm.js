@@ -1,11 +1,10 @@
- 
  export function mergeSort(array) {
-    console.log(array)
     const animations = [];
+   
     if(array.length <= 1) return array;
     const auxilaryArray = array.slice();
     mergeSortHelper(array, 0, array.length - 1, auxilaryArray, animations);
-  //  console.log(animations)
+    
     return animations;
 }
 
@@ -31,14 +30,11 @@ function doMerge(
     auxilaryArray,
     animations
 ){
-    console.log(startIdx, endIdx, middleIdx)
     let k = startIdx;
     let i = startIdx;
     let j = middleIdx + 1;
 
-    console.log( `start: k: ${k}, i: ${i}, j: ${j}`)
     while( i <= middleIdx && j <= endIdx){
-    console.log("while: 1")
         animations.push([i,j]);
         animations.push([i,j]);
         if(auxilaryArray[i] <= auxilaryArray[j]){
@@ -49,26 +45,18 @@ function doMerge(
             mainArray[k++] = auxilaryArray[j++];
         }
     }
-    console.log( `- 1 -: k: ${k}, i: ${i}, j: ${j}`)
     while( i<= middleIdx){
-    console.log("while: 2")
         animations.push([i,i]);
         animations.push([i,i]);
         animations.push([k, auxilaryArray[i]]);
         mainArray[k++] = auxilaryArray[i++];
     }
-    console.log( `- 2 -: k: ${k}, i: ${i}, j: ${j}`)
     while( j<= endIdx){
-    console.log("while: 3")
         animations.push([j,j]);
         animations.push([j,j]);
         animations.push([k, auxilaryArray[j]]);
         mainArray[k++] = auxilaryArray[j++];
     }
-    console.log( `finish: k: ${k}, i: ${i}, j: ${j}`)
-    console.log(mainArray, auxilaryArray)
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-   // console.log(mainArray)
 }
 
 export function bubbleSort(stateArray, updateArray) {
@@ -99,8 +87,8 @@ export function bubbleSort(stateArray, updateArray) {
 
 function handleDispatch(toDispatch, array, updateArray) {
     const arrayBars = document.getElementsByClassName("bar")
+    
     const setCurrentSwappers = (arr)=>{
-        console.log('setCurrentSwappers', arr)
         const [ one, two, doChange = false ] = arr;
         // arrayBars[one].style.backgroundColor = "red";
         // arrayBars[two].style.backgroundColor = "red";
@@ -111,24 +99,27 @@ function handleDispatch(toDispatch, array, updateArray) {
         // arrayBars[one].style.height = "red" + "px";
         // arrayBars[two].style.height = "turquoise" + "px";
     }
+    
     const setCurrentSorted = (val)=>{
-        console.log('setCurrentSorted', val)
+       // console.log('setCurrentSorted', val)
     }
+
     const setCurrentBubbleTwo = ( arr )=>{
-        console.log('setCurrentBubbleTwo', arr)
+       // console.log('setCurrentBubbleTwo', arr)
         const [ one, two ] = arr;
         if(one && two){
             arrayBars[one].style.backgroundColor = "turquoise";
             arrayBars[two].style.backgroundColor = "turquoise";
         }
     }
+
     if (!toDispatch.length) {
         setCurrentBubbleTwo(array.map((num, index) => index))
         setTimeout(() => {
             setCurrentBubbleTwo([])
             setCurrentSorted(array.map((num, index) => index))
            //setRunning(false)
-        }, 900);
+        }, 2);
         return;
     }
 
@@ -142,7 +133,8 @@ function handleDispatch(toDispatch, array, updateArray) {
 
     //dispatch(dispatchFunction(toDispatch.shift()));
     dispatchFunction(toDispatch.shift())
+    
     setTimeout(() => {
         handleDispatch(toDispatch, array, updateArray);
-    }, 10);
+    }, 2);
 }   

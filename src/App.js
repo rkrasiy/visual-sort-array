@@ -1,26 +1,9 @@
-import { useEffect, useState } from "react";
-import Logo from "./components/logo";
-import { fillArray, useBubbleAlgoritm } from "./utils"
-import classes from "./app.module.css"
-import SortingVisualizer from "./sorting-visualizer/sorting-visualizer";
+import SortingVisualizer2 from "./sorting-visualizer/sorting-visualizer-2";
+
 function App() {
-
-
-	const updateArrayHandler = ()=>{
-
-
-	}
-	const changeRangeHandler = (e)=>{
-
-	}
-
-	const startHandler = ()=>{
-
-	}
-
 	return (
 		<div className="App">
-			<SortingVisualizer></SortingVisualizer>
+			<SortingVisualizer2></SortingVisualizer2>
 		</div>
 	);
 }
