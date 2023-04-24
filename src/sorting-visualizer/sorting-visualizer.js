@@ -1,127 +1,95 @@
-import {useEffect, useState} from 'react';
-import Logo from '../components/logo';
-import * as sortingAlgorithms from '../sortingAlgoritm/sortingAlgoritm';
+import { useState } from 'react';
+
+import RadioInput from '../components/radio-input';
+import Time from '../components/time';
+
+import { useSelector, useDispatch } from 'react-redux';
+import { generate } from '../reducers/array';
+import { setRunning } from '../reducers/running';
+import { setCurrentSorted } from '../reducers/sorted';
+
+import bubbleSort from '../algorithms/bubbleSort';
+import mergeSort from '../algorithms/mergeSort';
+import heapSort from '../algorithms/heapSort';
+import quickSort from '../algorithms/quickSort';
 
 function SortingVisualizer(){
-    const [array, setArray] = useState([]);
-    const [arrayLength, setArrayLength] = useState(100);
-    const [animationSpeed_MS, setAnimationSpeed_MS] = useState(3)
-    const [isSorted, setIsSorted] = useState(false);
-    const [ isRunning, setIsRunning] = useState(false);
+    const array = useSelector(state => state.array);
+    const isRunning = useSelector( state => state.running);
+    const currentSwappers = useSelector( state => state.swappers);
+    const currentHeapThree = useSelector( state => state.heap);
+    const currentMerge = useSelector(state =>  state.merge);
+    const currentQuickTwo = useSelector( state => state.quick);
+    const currentBubbleTwo = useSelector( state => state.bubble);
+    const pivot = useSelector( state => state.pivot );
+    const currentSorted = useSelector( state => state.sorted);
+    const dispatch = useDispatch();
 
-    useEffect(()=>{
-       resetArray()
-    },[arrayLength])
+    const [ method, setMethod ] = useState('Merge');
 
-    const resetArray = () => {
-       const newArray = [];
-        for(let i = 0; i < arrayLength; i++){
-            newArray.push(randomIntFromInteral(5, 650))
-        }
-
-        setIsSorted(false);
-        setArray(newArray)
+    const startSorting = () => {
+        if(isRunning || currentSorted.length) return;
+        dispatch(setRunning(true))
+       
+        if(method === 'Merge')  mergeSort(array, dispatch, 10)
+        else if(method === 'Bubble') bubbleSort(array, dispatch, 2)
+        else if(method === 'Heap') heapSort(array, dispatch, 10)
+        else if(method === 'Quick') quickSort(array, dispatch, 10)
     }
 
-    const mergeSort = () =>{
-        const animations = sortingAlgorithms.mergeSort(array);
-        for(let i = 0; i < animations.length; i++){
-            const arrayBars = document.getElementsByClassName("bar")
-            const isColorChange = i % 3 !== 2;
-          
-            if(isColorChange){
-                const [barOneIdx, barTwoIdx] = animations[i];
-                const barOneStyle = arrayBars[barOneIdx].style;
-                const barTwoStyle = arrayBars[barTwoIdx].style;
-                const color = i % 3 === 0 ? 'red' : 'turquoise';
-                setTimeout(()=>{
-                    barOneStyle.backgroundColor = color;
-                    barTwoStyle.backgroundColor = color;
-                },i * animationSpeed_MS)
-            }else{
-                setTimeout(()=>{
-                    const [barOneIdx, newHeight, barTwoIdx, oldHeight] = animations[i];
-                   // console.log(animations[i])
-                    const barOneStyle = arrayBars[barOneIdx].style;
-                    barOneStyle.height = `${newHeight}px`;
-                    if(barTwoIdx){
-                        const barTwoStyle = arrayBars[barTwoIdx].style;
-                        barTwoStyle.height = `${oldHeight}px`;
-                    }
-                    //arrayBars[barOneIdx].innerHTML = newHeight;
-                }, i * animationSpeed_MS)
-            }
-            if(i ===  animations.length - 1){
-                setTimeout(()=>{
-                   setIsSorted(true)
-                }, i * animationSpeed_MS)
-            }
-        }
+    const generateHandler = () => {
+        dispatch(generate())
+        dispatch(setCurrentSorted([]));
     }
 
-    const bubbleSort = () => {
-        const animations = sortingAlgorithms.bubbleSort(array, (newArr)=>setArray(newArr));
-    }
-
-	const changeRangeHandler = (e)=>{
-        let value = parseInt(e.target.value);
-        let speed = 3
-
-        if(value <= 20){
-            speed = 300
-        }else if(value <= 50){
-            speed = 15
-        }else if(value <= 100){
-            speed = 12
-        }else if(value < 150){
-            speed = 9
-        }else if(value < 200){
-            speed = 6
-        }else if(value <= 250){
-            speed = 3
-        }
-
-        setAnimationSpeed_MS(speed)
-        setArrayLength(value)
-        //resetArray()
-	}
-    const classes = isSorted ? "sorted bar" : "bar"
     return (
-  
         <>
-          <header className="App-header">
-				<Logo />
-                <section>
-                    <div>
-                         <h4>Array length</h4>
-                        <input type="range" min="10" max="300" step="10" onChange={changeRangeHandler} value={arrayLength}/>
-                        <span>{array.length}</span>
-                    </div>
-                    <div>
-                        <h4>Methods</h4>
-                        {
-                            [
-                                { name: "Merge", func: mergeSort }, 
-                                { name: "Buble", func: bubbleSort }
-                            ].map( btn => (
-                                <button 
-                                    key = { btn.name } 
-                                    onClick = { btn.func } 
-                                    className = "btn sortBtn">
-                                        { btn.name }
-                                    </button>
-                            ))
+            <div className="container max-w-6xl mx-auto mb-2 flex flex-row items-center ">
+                <div className='font-mono flex-1'>
+                    Elements: {array.length}
+                </div>
+                    
+                <div className='flex-1'>
+                    {
+                        [
+                            "Merge", 
+                            "Bubble",
+                            "Heap",
+                            "Quick"
+                        ].map( btn => <RadioInput name={btn} key={btn} isChecked={method} onChange={()=>setMethod(btn)}/>)
+                    }
+                </div>
+                <button onClick={generateHandler} className="px-4 py-2 font-mono bg-sky-500 rounded-md text-white">New Array</button>
+			</div>
+            <div className="container relative max-w-6xl mx-auto flex flex-row flex-nowrap border rounded-xl justify-between items-end gap-px p-2 h-[70vh]">
+                <div className='absolute left-2/4 top-6 -translate-x-2/4 w-full flex flex-col justify-center items-center'>
+                    <button 
+                        onClick={startSorting}
+                        className={` rounded-md px-4 py-2 font-mono ${isRunning || currentSorted.length ? 'bg-sky-200 cursor-not-allowed' : 'bg-sky-500'} text-white`}
+                        > {
+                            isRunning ? 'Running!':'Start!'
                         }
-                    </div>
-                    <div>
-                        <h4>New Array</h4>
-                        <button onClick={resetArray} className="btn green">Generate</button>
-                    </div>
-                </section>
-			</header>
-            <div className="container">
+                    </button>
+                    <Time timer={ 
+                        isRunning ? 'start' : currentSorted.length && !isRunning ? 'stop' : 'reset'
+                     }/>
+                </div>
                 {
-                    array.map((value, idx)=><div className={classes} key={idx} style={{height: `${value}px`}}></div>)
+                    array.map((value, index) => {
+                        const bg = currentSwappers.includes(index) ?
+                                "bg-red-400" : currentBubbleTwo.includes(index) ||
+                                    currentQuickTwo.includes(index) || currentHeapThree.includes(index) ||
+                                        currentMerge.includes(index) ?
+                                            "bg-green-400" : pivot === index ?
+                                                "bg-yellow-400" : currentSorted.includes(index) ?
+                                                    "bg-violet-400" : "bg-sky-400";
+                        return (
+                            <div className={`bar flex-grow inline-block min-w-[2px] ${bg}`}
+                                key={index} 
+                                style={{height: `${value}px`}}>
+                            </div>
+                        )
+                    })
                 }
             </div>
         </>

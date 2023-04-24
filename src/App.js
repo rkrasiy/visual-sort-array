@@ -1,9 +1,10 @@
-import SortingVisualizer2 from "./sorting-visualizer/sorting-visualizer-2";
+import Time from "./components/time";
+import SortingVisualizer from "./sorting-visualizer/sorting-visualizer";
 
 function App() {
 	return (
 		<div className="App">
-			<SortingVisualizer2></SortingVisualizer2>
+			<SortingVisualizer />
 		</div>
 	);
 }
