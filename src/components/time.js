@@ -1,56 +1,66 @@
 import { useReducer, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
 const initialState = {
     isRunning: false,
     time: 0
 }
 
-function Time({timer}) {
+function Time() {
     const [state, dispatch] = useReducer(reducer, initialState);
     const idRef = useRef(0);
 
+    const isRunning = useSelector( state => state.running);
+    const currentSorted = useSelector( state => state.sorted);
+    
     useEffect( () => {
         if(!state.isRunning){
             return;
         }
 
-        idRef.current = setInterval(()=>dispatch({ type: "tick" }), 1);
+        idRef.current = setInterval(()=>dispatch({ type: "tick" }), 100);
 
         return () => {
             clearInterval(idRef.current);
             idRef.current = 0;
         }
 
-    }, [state.isRunning]);
+    }, [state.isRunning, isRunning]);
 
-    if(timer === 'start'){
+
+    if(isRunning){
         state.isRunning = true
-    }else if(timer === 'stop'){
+    }else if( currentSorted.length && !isRunning){
         state.isRunning = false;
-    }else if(timer === 'reset'){
+    }else {
         state.isRunning = false;
         state.time = 0;
     }
 
 
     return (
-        <div className="font-mono text-center">
-            {msToTime(state.time)}
-
-        </div>
+        <>
+            <span className="text-9xl font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-slate-400 to-transparent">
+                {msToTime(state.time)}s
+            </span>
+        </>
     )
 }
 
-function msToTime(s) {
-  let ms = s % 258;
-  s = (s - ms) / 258;
-  let secs = s % 60;
-  s = (s - secs) / 60;
-  let mins = s % 60;
+function msToTime( time ) {
+    const minuts = Math.floor(time / 600);
+    const base = 60 * minuts;
+    const seconds =  Math.floor((time / 10) - base)
+    const milis = time % 10;
 
-  let mm = mins < 10 ? '0' + mins : mins;
-  let ss = secs < 10 ? '0' + secs : secs;
-  return mm  + ':' + ss + '.' + ms;
+
+    let view = milis;
+    if(seconds > 0)
+        view = seconds + "." + view
+    if(minuts > 0)
+        view = minuts + "." + view
+   
+    return view
 }
 
 function reducer ( state, action ){

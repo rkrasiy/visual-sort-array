@@ -1,13 +1,9 @@
-import logo from '../logo.svg';
-
-function Logo (){
+export default function Logo (){
     return (
-        <div className="logo">
-            <img src={logo} className="App-logo" alt="logo" style={{width: "62px"}} />
-            <h1>Array sort visualization</h1>
-        </div>
+        <a className='leading-none text-stone-400 pr-1 uppercase p-2 block' href="https://krasiyruslan.vercel.app" target="_blunk">
+            <span className='block -tracking-widest'>ruslan</span>
+            <span className='block'>krasiy</span>
+        </a>
     )
 
 }
-
-export default Logo;
